@@ -1,9 +1,6 @@
-from django.shortcuts import render
-from rest_framework import generics, viewsets
-from rest_framework.decorators import action
+from rest_framework import viewsets
 from .models import Department
 from .serializers import DepartmentSerializer
-from accounts.serializers import DoctorSerializer
 
 # Create your views here.
 class DepartmentViewSet(viewsets.ModelViewSet):

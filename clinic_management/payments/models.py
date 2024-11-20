@@ -1,11 +1,16 @@
 from django.db import models
-from accounts.models import Patient
+from appointments.models import Appointment
 
 # Create your models here.
 class Payment(models.Model):
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    amount = models.DecimalField(max_digits=10, decimal_places=3)
-    description = models.TextField(blank=True, null=True)
+    STATUS_CHOICES = (
+        ('pending', 'Pending'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed'),
+    )
+    
+    appointment = models.OneToOneField(Appointment, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
-    is_paid = models.BooleanField(default=False)
-    paid_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True)

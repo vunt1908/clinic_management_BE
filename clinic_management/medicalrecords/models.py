@@ -1,13 +1,14 @@
 from django.db import models
-from accounts.models import Patient, Doctor
+from patient.models import Patient
+from doctor.models import Doctor
+from appointments.models import Appointment
 
 # Create your models here.
 class MedicalRecord(models.Model):
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
-    symptoms = models.TextField() # triệu chứng
-    diagnoses = models.TextField() # chẩn đoán
-    test_results = models.TextField() # kết quả xét nghiệm
-    price = models.DecimalField(max_digits=10, decimal_places=3) 
+    appointment = models.OneToOneField(Appointment, on_delete=models.CASCADE)
+    symptoms = models.TextField()
+    diagnosis = models.TextField()
+    results = models.TextField()
+    notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

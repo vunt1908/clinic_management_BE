@@ -1,13 +1,9 @@
 from django.urls import path, include
-from .views import UserViewSet, PatientViewSet, DoctorViewSet, StaffViewSet
 from rest_framework.routers import DefaultRouter
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from accounts.views import UserViewSet
 
 router = DefaultRouter()
-router.register(r'users', UserViewSet, basename='user')
-router.register(r'patients', PatientViewSet, basename='patients')
-router.register(r'doctors',DoctorViewSet, basename='doctors')
-router.register(r'staffs', StaffViewSet, basename='staff')
+router.register(r'', UserViewSet, basename='user')
 
 urlpatterns = [
     path('', include(router.urls)),

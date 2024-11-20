@@ -41,8 +41,12 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
+    'django_filters',
     'accounts',
-    'authentication',
+    'manager',
+    'doctor',
+    'patient',
+    'staff',
     'appointments',
     'medicalrecords',
     'departments',
@@ -104,7 +108,7 @@ WSGI_APPLICATION = 'clinic_management.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'clinic',
+        'NAME': 'test',
         'USER': 'root',
         'PASSWORD': '123456',
         'HOST':'localhost',
@@ -117,6 +121,8 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 CORS_ALLOWED_CREDENTIALS = True
+
+APPEND_SLASH=False
 
 AUTH_USER_MODEL = 'accounts.User'
 

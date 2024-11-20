@@ -16,13 +16,35 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from doctor.views import DoctorViewSet
+from patient.views import PatientViewSet
+from appointments.views import AppointmentViewSet
+from medicalrecords.views import MedicalRecordViewSet
+from payments.views import PaymentViewSet
+from departments.views import DepartmentViewSet
+from staff.views import StaffViewSet
+from accounts.views import UserViewSet, login
+from manager.views import ManagerDashboardViewSet
+from patient.views import register_patient
+
+router = DefaultRouter()
+router.register(r'accounts', UserViewSet, basename='user')
+router.register(r'patients', PatientViewSet)
+router.register(r'doctors', DoctorViewSet)
+router.register(r'staffs', StaffViewSet)
+router.register(r'appointments', AppointmentViewSet, basename='appointment')
+router.register(r'medical-records', MedicalRecordViewSet, basename='medical-record')
+router.register(r'payments', PaymentViewSet, basename='payment')
+router.register(r'departments', DepartmentViewSet, basename='department')
+router.register(r'manager-dashboard', ManagerDashboardViewSet, basename='manager-dashboard')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/accounts/', include('accounts.urls')),
-    path('api/auth/', include('authentication.urls')),
-    path('api/departments/', include('departments.urls')),
-    path('api/appointments/', include('appointments.urls')),
-    path('api/medicalrecords/', include('medicalrecords.urls')),
-    path('api/payment/', include('payments.urls')),
+    path('api/', include(router.urls)),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('auth/register/', register_patient, name='register-patient'),
+    path('auth/login/',login, name='login'),
 ]

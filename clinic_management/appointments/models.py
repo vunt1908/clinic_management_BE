@@ -1,21 +1,23 @@
 from django.db import models
-from accounts.models import Patient, Doctor, Department
+from doctor.models import Doctor
+from patient.models import Patient
 
 # Create your models here.
 class Appointment(models.Model):
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    STATUS_CHOICES = (
+        ('pending', 'Pending'),
+        ('confirmed', 'Confirmed'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+    )
+    
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     start_time = models.TimeField()
     end_time = models.TimeField()
-    appointment_date = models.DateField()
-    STATUS_CHOICES = (
-        ('PENDING', 'pending'),
-        ('CONFIRMED', 'confirmed'),
-        ('REJECTED', 'rejected'),
-    )
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    reasons = models.TextField()
-    notes = models.TextField(blank=True, null=True)
-    price = models.DecimalField(max_digits=10, decimal_places=3)
+    date = models.DateField()
+    notes = models.TextField(blank=True)
+    reason = models.TextField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
