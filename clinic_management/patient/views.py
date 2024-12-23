@@ -1,46 +1,55 @@
-from rest_framework import viewsets, status, permissions
-from rest_framework.decorators import action, api_view, permission_classes
-from rest_framework.response import Response
-from patient.serializers import PatientSerializer, RegisterPatientSerializer
-from rest_framework_simplejwt.tokens import RefreshToken
+from django.db import transaction
+from rest_framework import viewsets, status
+from patient.serializers import PatientSerializer
 from .models import Patient
-from accounts.views import IsManagerUser
-from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
 
-# Create your views here.
 class PatientViewSet(viewsets.ModelViewSet):
     queryset = Patient.objects.all()
     serializer_class = PatientSerializer
-    # permission_classes = [IsManagerUser]
 
-@api_view(['POST'])
-@permission_classes([AllowAny]) 
-def register_patient(request):
-    serializer = RegisterPatientSerializer(data=request.data)
-    
-    if serializer.is_valid():
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        patient = serializer.save()
+        
+        return Response({
+            'status': 'success',
+            'message': 'Thêm mới bệnh nhân thành công',
+            'data': PatientSerializer(patient).data
+        }, status=status.HTTP_201_CREATED)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        patient = serializer.save()
+        
+        return Response({
+            'status': 'success',
+            'message': 'Cập nhật thông tin bệnh nhân thành công',
+            'data': PatientSerializer(patient).data
+        })
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        user = instance.user
+        
         try:
-            patient = serializer.save()
-            refresh = RefreshToken.for_user(patient.user)
+            with transaction.atomic():
+                instance.delete()
+                user.delete()
             return Response({
                 'status': 'success',
-                'data': {
-                    'user': {
-                        'id': patient.user.id,
-                        'username': patient.user.username,
-                        'email': patient.user.email,
-                        'role': patient.user.role,
-                    },
-                    'tokens': {
-                        'refresh': str(refresh),
-                        'access': str(refresh.access_token),
-                    }
-                }
-            }, status=status.HTTP_201_CREATED)
-        
+                'message': 'Xoá bệnh nhân thành công'
+            }, status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
             return Response({
                 'status': 'error',
                 'message': str(e)
             }, status=status.HTTP_400_BAD_REQUEST)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get_queryset(self):
+        queryset = Patient.objects.all()
+        return queryset

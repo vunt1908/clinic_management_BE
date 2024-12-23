@@ -5,8 +5,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from .models import User
 from .serializers import UserSerializer, LoginSerializer
-
-# Create your views here.    
+   
 class IsManagerUser(permissions.BasePermission): 
     def has_permission(self, request, view):
         return request.user and request.user.role == 'manager'  
@@ -18,16 +17,18 @@ class IsDoctorUser(permissions.BasePermission):
 class IsStaffUser(permissions.BasePermission):
     def has_permission(self, request, view):
         return request.user and request.user.role == 'staff'
+    
+class IsNurseUser(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user and request.user.role == 'nurse'
 
 class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
-    # permission_classes = [IsManagerUser]
 
     def get_queryset(self):
         return User.objects.all()
     
 @api_view(['POST'])
-# @permission_classes([permissions.AllowAny])
 def login(request):
     serializer = LoginSerializer(data=request.data)
     if serializer.is_valid():
@@ -53,7 +54,7 @@ def login(request):
         else:
             return Response({
                 'status': 'error',
-                'message': 'Invalid credentials. Please try again.'
+                'message': 'Thông tin đăng nhập không hợp lệ. Vui lòng thử lại'
             }, status=status.HTTP_401_UNAUTHORIZED)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -6,9 +6,10 @@ from patient.models import Patient
 from doctor.models import Doctor
 
 class AppointmentSerializer(serializers.ModelSerializer):
-    doctor = DoctorSerializer()
-    patient = PatientSerializer()
+    # price = serializers.IntegerField(source= 'doctor.examination_price', read_only=True)
+    created_at = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', read_only=True)
     
     class Meta:
         model = Appointment
-        fields = '__all__'
+        fields = ['id', 'time_slot', 'date', 'notes', 'reason', 'status', 'created_at', 'doctor', 'patient']
+

@@ -3,29 +3,38 @@ from accounts.serializers import UserSerializer
 from .models import Manager
 from accounts.models import User
 
-class ManagerSerializer(serializers.ModelSerializer):  # Changed from AdminSerializer
+class ManagerSerializer(serializers.ModelSerializer):  
     user = UserSerializer()
 
     class Meta:
-        model = Manager  # Changed from Admin
+        model = Manager 
         fields = ['id', 'user']
 
     def create(self, validated_data):
         user_data = validated_data.pop('user')
-        user_data['role'] = 'manager'  # Changed from admin
-        user = User.objects.create(**user_data)
-        manager = Manager.objects.create(user=user, **validated_data)  # Changed from Admin
+        user_data['role'] = 'manager'
+        
+        user_serializer = UserSerializer(data=user_data)
+        user_serializer.is_valid(raise_exception=True)
+        user = user_serializer.save()
+
+        manager = Manager.objects.create(user=user, **validated_data)
         return manager
 
     def update(self, instance, validated_data):
-        user_data = validated_data.pop('user', {})
-        user = instance.user
+        user_data = validated_data.pop('user', None)
         
-        for attr, value in user_data.items():
-            setattr(user, attr, value)
-        user.save()
-        
+        if user_data:
+            user_serializer = UserSerializer(
+                instance.user,
+                data=user_data,
+                partial=True
+            )
+            user_serializer.is_valid(raise_exception=True)
+            user_serializer.save()
+
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
+        
         return instance

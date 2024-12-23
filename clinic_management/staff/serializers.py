@@ -13,19 +13,28 @@ class StaffSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user_data = validated_data.pop('user')
         user_data['role'] = 'staff'
-        user = User.objects.create(**user_data)
+        
+        user_serializer = UserSerializer(data=user_data)
+        user_serializer.is_valid(raise_exception=True)
+        user = user_serializer.save()
+
         staff = Staff.objects.create(user=user, **validated_data)
         return staff
 
     def update(self, instance, validated_data):
-        user_data = validated_data.pop('user', {})
-        user = instance.user
+        user_data = validated_data.pop('user', None)
         
-        for attr, value in user_data.items():
-            setattr(user, attr, value)
-        user.save()
-        
+        if user_data:
+            user_serializer = UserSerializer(
+                instance.user,
+                data=user_data,
+                partial=True
+            )
+            user_serializer.is_valid(raise_exception=True)
+            user_serializer.save()
+
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
+        
         return instance
