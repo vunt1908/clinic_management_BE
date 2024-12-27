@@ -1,10 +1,8 @@
 from django.db import models
-from appointments.models import Appointment
 from services.models import Services
-from medicalrecords.models import MedicalRecord
 from payments.models import Payment
+from appointments.models import Appointment
 
-# Create your models here.
 class Examination(models.Model):
     appointment = models.OneToOneField(
         Appointment, 
@@ -13,17 +11,23 @@ class Examination(models.Model):
     )
     services = models.ManyToManyField(
         Services,
-        related_name="examinations"
-    )
-    medical_record = models.OneToOneField(
-        MedicalRecord, 
-        on_delete=models.CASCADE, 
-        related_name="examination"
+        related_name="examinations",
+        null=True,
+        blank=True
     )
     payment = models.OneToOneField(
         Payment, 
         on_delete=models.CASCADE, 
-        related_name="examination"
+        related_name="examination",
+        null=True,
+        blank=True
     )
+    pathological_process = models.TextField()
+    personal_history = models.TextField()
+    family_history = models.TextField()
+    symptoms = models.TextField()
+    diagnosis = models.TextField()
+    paraclinical_results = models.FileField(upload_to='paraclinical_results/', null=True, blank=True)
+    results = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

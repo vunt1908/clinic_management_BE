@@ -64,62 +64,25 @@ class AppointmentViewSet(viewsets.ModelViewSet):
                 'message': f'Lỗi xảy ra: {str(e)}'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
-    @action(detail=True, methods=['patch'])
+    @action(detail=True, methods=["patch"])
     def update_status(self, request, pk=None):
-        appointment = self.get_object()
+        """
+        Cập nhật trạng thái lịch hẹn.
+        """
+        try:
+            appointment = self.get_object()
+            new_status = request.data.get('status')
 
-        if appointment.status != 'pending':
-            return Response({
-                'status': 'error',
-                'message': 'Chỉ có thể cập nhật trạng thái đặt lịch cho lịch đang chờ.'
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        new_status = request.data.get('status')
-        if new_status not in ['confirmed', 'completed', 'cancelled', 'examining']:
-            return Response({
-                'status': 'error',
-                'message': 'Trạng thái không hợp lệ.'
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        appointment.status = new_status
-        appointment.save()
+            if new_status not in [status[0] for status in Appointment.STATUS_CHOICES]:
+                return Response({"error": "Trạng thái không hợp lệ."}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({
-            'status': 'success',
-            'message': 'Cập nhật trạng thái đặt lịch thành công.',
-            'data': AppointmentSerializer(appointment).data
-        })
-    
-    @action(detail=True, methods=['patch'])
-    def update_appointment(self, request, pk=None):
-        appointment = self.get_object()
+            appointment.status = new_status
+            appointment.save()
 
-        # if appointment.status != 'pending':
-        #     return Response({
-        #         'status': 'error',
-        #         'message': 'Chỉ có thể chỉnh sửa lịch hẹn cho lịch đang chờ.'
-        #     }, status=status.HTTP_400_BAD_REQUEST)
+            return Response(AppointmentSerializer(appointment).data)
 
-        for field in ['time_slot', 'date', 'notes', 'reason']:
-            if field in request.data:
-                setattr(appointment, field, request.data[field])
-        
-        doctor = appointment.doctor
-        date = appointment.date
-        time_slot = appointment.time_slot
-        # if Appointment.objects.filter(doctor=doctor, date=date, time_slot=time_slot).exclude(id=appointment.id).exists():
-        #     return Response({
-        #         'status': 'error',
-        #         'message': 'Trùng lịch hẹn. Vui lòng chọn thời gian khác.'
-        #     }, status=status.HTTP_400_BAD_REQUEST)
-
-        appointment.save()
-
-        return Response({
-            'status': 'success',
-            'message': 'Thông tin lịch hẹn đã được cập nhật.',
-            'appointment': AppointmentSerializer(appointment).data
-        })
+        except Appointment.DoesNotExist:
+            return Response({"error": "Lịch hẹn không tồn tại."}, status=status.HTTP_404_NOT_FOUND)
     
     @action(detail=False, methods=['post'])
     def staff_create(self, request):
@@ -138,3 +101,9 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         appointments = Appointment.objects.all().select_related('doctor', 'patient')
         serializer = self.get_serializer(appointments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+        
+
+
+
+    

@@ -50,7 +50,6 @@ INSTALLED_APPS = [
     'staff',
     'nurse',
     'appointments',
-    'medicalrecords',
     'departments',
     'payments',
     'services',

@@ -8,21 +8,10 @@ class ExaminationSerializer(serializers.ModelSerializer):
 
     services = serializers.PrimaryKeyRelatedField(
         many=True,
-        queryset=Services.objects.all()
+        queryset=Services.objects.all(),
+        required=False
     )
 
     class Meta:
         model = Examination
         fields = '__all__'
-
-    def create(self, validated_data):
-        services_data = validated_data.pop('services', [])
-        examination = Examination.objects.create(**validated_data)
-        examination.services.set(services_data)  
-        return examination
-
-    def update(self, instance, validated_data):
-        services_data = validated_data.pop('services', None)
-        if services_data is not None:
-            instance.services.set(services_data) 
-        return super().update(instance, validated_data)

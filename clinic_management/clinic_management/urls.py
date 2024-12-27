@@ -23,7 +23,6 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from doctor.views import DoctorViewSet
 from patient.views import PatientViewSet
 from appointments.views import AppointmentViewSet
-from medicalrecords.views import MedicalRecordViewSet
 from payments.views import PaymentViewSet
 from departments.views import DepartmentViewSet
 from staff.views import StaffViewSet
@@ -41,7 +40,6 @@ router.register(r'staffs', StaffViewSet)
 router.register(r'managers', ManagerViewSet, basename='manager')
 router.register(r'nurses', NurseViewSet, basename='nurse')
 router.register(r'appointments', AppointmentViewSet, basename='appointment')
-router.register(r'medical-records', MedicalRecordViewSet, basename='medical-record')
 router.register(r'payments', PaymentViewSet, basename='payment')
 router.register(r'departments', DepartmentViewSet, basename='department')
 router.register(r'services', ServicesViewSet, basename='services')

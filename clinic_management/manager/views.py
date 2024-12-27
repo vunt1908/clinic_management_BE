@@ -8,9 +8,13 @@ from appointments.models import Appointment
 from payments.models import Payment
 from accounts.views import IsManagerUser
 from rest_framework.response import Response
-from django.db.models import Count
+from django.db.models import Count, Sum
 from .models import Manager
 from .serializers import ManagerSerializer
+from nurse.models import Nurse
+from staff.models import Staff
+from services.models import Services
+from services.serializers import ServicesSerializer
 
 class ManagerViewSet(viewsets.ModelViewSet):
     queryset = Manager.objects.all()
@@ -71,10 +75,25 @@ class DashboardViewSet(viewsets.ViewSet):
         stats = {
             'total_patients': Patient.objects.count(),
             'total_doctors': Doctor.objects.count(),
+            'total_nurses': Nurse.objects.count(),
+            'total_staff': Staff.objects.count(),
             'total_appointments': Appointment.objects.count(),
             'today_appointments': Appointment.objects.filter(date=today).count(),
             'pending_payments': Payment.objects.filter(status='pending').count(),
             'completed_payments': Payment.objects.filter(status='completed').count(),
+            'total_payments': Payment.objects.aggregate(total=Sum('amount'))['total'] or 0,
+            'today_payments': Payment.objects.filter(created_at__date=today).aggregate(total=Sum('amount'))['total'] or 0,
+            'total_services': Services.objects.count(),
         }
+
+        most_selected_service = Services.objects.annotate(
+            num_examinations=Count('examinations')
+        ).order_by('-num_examinations').first()
+
+        if most_selected_service:
+            most_selected_service_data = ServicesSerializer(most_selected_service).data
+            stats['most_selected_service'] = most_selected_service_data
+        else:
+            stats['most_selected_service'] = None
 
         return Response(stats)

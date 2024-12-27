@@ -1,9 +1,6 @@
 from rest_framework import serializers
 from .models import Appointment
-from patient.serializers import PatientSerializer
-from doctor.serializers import DoctorSerializer
-from patient.models import Patient
-from doctor.models import Doctor
+from examination.serializers import ExaminationSerializer
 
 class AppointmentSerializer(serializers.ModelSerializer):
     # price = serializers.IntegerField(source= 'doctor.examination_price', read_only=True)

@@ -9,6 +9,8 @@ class Appointment(models.Model):
         ('pending', 'Pending'),
         ('confirmed', 'Confirmed'),
         ('examining', 'Examining'),
+        ('awaiting_clinical_results', 'Awaiting clinical results'),
+        ('paraclinical_results_available', 'Paraclinical results available'),
         ('completed', 'Completed'),
         ('cancelled', 'Cancelled'),
     )
@@ -22,11 +24,18 @@ class Appointment(models.Model):
     
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    time_slot = models.CharField(max_length=20, choices=[(slot, slot) for slot in TIME_SLOTS], null=True)
+    # examination = models.OneToOneField(
+    #     Examination,
+    #     on_delete=models.SET_NULL,
+    #     null=True,
+    #     blank=True,
+    #     related_name='appointment'
+    # )
+    time_slot = models.CharField(max_length=20, choices=[(slot, slot) for slot in TIME_SLOTS])
     date = models.DateField()
-    notes = models.TextField(blank=True)
+    notes = models.TextField(null=True, blank=True)
     reason = models.TextField()
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
