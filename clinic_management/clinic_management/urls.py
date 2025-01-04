@@ -53,6 +53,7 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     # path('auth/register/', register_patient, name='register-patient'),
     path('auth/login/',login, name='login'),
+    # path('accounts/change-password/', ChangePasswordView.as_view(), name='change-password'),
 ]
 
 if settings.DEBUG:

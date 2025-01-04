@@ -1,7 +1,7 @@
 from django.db import transaction
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
-from datetime import datetime
+from datetime import datetime, timedelta
 from patient.models import Patient
 from doctor.models import Doctor
 from appointments.models import Appointment
@@ -71,19 +71,45 @@ class DashboardViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['get'])
     def statistics(self, request):
         today = datetime.now().date()
+        current_month = today.replace(day=1)
+        current_year = today.replace(month=1, day=1)
+        filter_type = request.GET.get('filter', 'week')
+        data = []
+
+        if filter_type == "week":
+            start_of_week = today - timedelta(days=today.weekday())
+            for i in range(7):
+                day = start_of_week + timedelta(days=i)
+                total = Payment.objects.filter(created_at__date=day, status='completed').aggregate(total=Sum('amount'))['total'] or 0
+                data.append({"label": day.strftime("%A"), "value": total})
+        elif filter_type == "month":
+            for month in range(1, 13):
+                total = Payment.objects.filter(
+                    created_at__month=month, created_at__year=today.year, status='completed'
+                ).aggregate(total=Sum('amount'))['total'] or 0
+                data.append({"label": f"Tháng {month}", "value": total})
+        # elif filter_type == "year":
+        #     current_year = today.year
+        #     for year in range(current_year - 1, current_year + 2): 
+        #         total = Payment.objects.filter(created_at__year=year).aggregate(total=Sum('amount'))['total'] or 0
+        #         data.append({"label": f"Năm {year}", "value": total})
 
         stats = {
             'total_patients': Patient.objects.count(),
             'total_doctors': Doctor.objects.count(),
             'total_nurses': Nurse.objects.count(),
-            'total_staff': Staff.objects.count(),
+            'total_staffs': Staff.objects.count(),
             'total_appointments': Appointment.objects.count(),
+            'completed_appointments': Appointment.objects.filter(status='completed').count(),
+            'upcoming_appointments': Appointment.objects.filter(date__gte=today).count(),
             'today_appointments': Appointment.objects.filter(date=today).count(),
+            'month_appointments': Appointment.objects.filter(date__gte=current_month).count(),
             'pending_payments': Payment.objects.filter(status='pending').count(),
             'completed_payments': Payment.objects.filter(status='completed').count(),
-            'total_payments': Payment.objects.aggregate(total=Sum('amount'))['total'] or 0,
+            'total_payments': Payment.objects.filter(status='completed').aggregate(total=Sum('amount'))['total'] or 0,
             'today_payments': Payment.objects.filter(created_at__date=today).aggregate(total=Sum('amount'))['total'] or 0,
             'total_services': Services.objects.count(),
+            "chart_data": data,
         }
 
         most_selected_service = Services.objects.annotate(

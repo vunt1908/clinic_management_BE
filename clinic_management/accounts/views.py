@@ -5,6 +5,8 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from .models import User
 from .serializers import UserSerializer, LoginSerializer
+from rest_framework.views import APIView
+from rest_framework.response import Response
    
 class IsManagerUser(permissions.BasePermission): 
     def has_permission(self, request, view):

@@ -46,20 +46,14 @@ class ExaminationViewSet(viewsets.ModelViewSet):
         
     @action(detail=True, methods=["post"])
     def add_examination(self, request, pk=None):
-        """
-        Thêm thông tin khám bệnh cho lịch hẹn.
-        """
         try:
             appointment = Appointment.objects.get(pk=pk)
             
-            # Kiểm tra nếu lịch hẹn đã có thông tin khám bệnh
             if hasattr(appointment, 'examination'):
                 return Response({"error": "Lịch hẹn đã có thông tin khám bệnh."}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Tạo mới Examination
             serializer = ExaminationSerializer(data=request.data)
             if serializer.is_valid():
-                # Gán lịch hẹn vào examination
                 serializer.save(appointment=appointment)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -69,18 +63,12 @@ class ExaminationViewSet(viewsets.ModelViewSet):
         
     @action(detail=True, methods=["patch"])
     def update_examination(self, request, pk=None):
-        """
-        Cập nhật thông tin khám bệnh cho lịch hẹn.
-        """
         try:
             appointment = Appointment.objects.get(pk=pk)
-            # Lấy đối tượng Examination đã có liên kết với lịch hẹn
             examination = appointment.examination
-            
-            # Sử dụng serializer để cập nhật thông tin examination
-            serializer = ExaminationSerializer(examination, data=request.data, partial=True)  # partial=True để chỉ cập nhật phần cần thiết
+            serializer = ExaminationSerializer(examination, data=request.data, partial=True)  
             if serializer.is_valid():
-                serializer.save()  # Lưu lại dữ liệu đã cập nhật
+                serializer.save()  
                 return Response(serializer.data, status=status.HTTP_200_OK)
             
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -89,3 +77,26 @@ class ExaminationViewSet(viewsets.ModelViewSet):
             return Response({"error": "Không tìm thấy lịch hẹn."}, status=status.HTTP_404_NOT_FOUND)
         except Examination.DoesNotExist:
             return Response({"error": "Không tìm thấy thông tin khám bệnh cho lịch hẹn này."}, status=status.HTTP_404_NOT_FOUND)
+        
+    @action(detail=True, methods=["patch"])
+    def update_payment_status(self, request, pk=None):
+        try:
+            examination = self.get_object()  
+            payment = examination.payment  
+
+            if not payment:
+                return Response({"error": "Không tìm thấy thông tin thanh toán."}, status=status.HTTP_404_NOT_FOUND)
+
+            new_status = request.data.get("status", None) 
+            if new_status not in ["pending", "completed", "failed"]:
+                return Response({"error": "Trạng thái không hợp lệ."}, status=status.HTTP_400_BAD_REQUEST)
+
+            payment.status = new_status
+            payment.save()
+
+            return Response(
+                {"message": f"Trạng thái thanh toán đã được cập nhật thành {new_status}."},
+                status=status.HTTP_200_OK,
+            )
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
