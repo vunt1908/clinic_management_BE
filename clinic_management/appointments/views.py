@@ -66,9 +66,6 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         
     @action(detail=True, methods=["patch"])
     def update_status(self, request, pk=None):
-        """
-        Cập nhật trạng thái lịch hẹn.
-        """
         try:
             appointment = self.get_object()
             new_status = request.data.get('status')

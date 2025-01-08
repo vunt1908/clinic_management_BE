@@ -27,7 +27,7 @@ class ManagerViewSet(viewsets.ModelViewSet):
         
         return Response({
             'status': 'success',
-            'message': 'Manager created successfully',
+            'message': 'Thêm mới quản lý thành công.',
             'data': ManagerSerializer(manager).data
         }, status=status.HTTP_201_CREATED)
 
@@ -40,7 +40,7 @@ class ManagerViewSet(viewsets.ModelViewSet):
         
         return Response({
             'status': 'success',
-            'message': 'Manager updated successfully',
+            'message': 'Cập nhật thông tin quản lý thành công.',
             'data': ManagerSerializer(manager).data
         })
 
@@ -54,7 +54,7 @@ class ManagerViewSet(viewsets.ModelViewSet):
                 user.delete()
             return Response({
                 'status': 'success',
-                'message': 'Manager deleted successfully'
+                'message': 'Xoá thành công quản lý.'
             }, status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
             return Response({
@@ -80,19 +80,14 @@ class DashboardViewSet(viewsets.ViewSet):
             start_of_week = today - timedelta(days=today.weekday())
             for i in range(7):
                 day = start_of_week + timedelta(days=i)
-                total = Payment.objects.filter(created_at__date=day, status='completed').aggregate(total=Sum('amount'))['total'] or 0
+                total = Payment.objects.filter(updated_at__date=day, status='completed').aggregate(total=Sum('amount'))['total'] or 0
                 data.append({"label": day.strftime("%A"), "value": total})
         elif filter_type == "month":
             for month in range(1, 13):
                 total = Payment.objects.filter(
-                    created_at__month=month, created_at__year=today.year, status='completed'
+                    updated_at__month=month, updated_at__year=today.year, status='completed'
                 ).aggregate(total=Sum('amount'))['total'] or 0
                 data.append({"label": f"Tháng {month}", "value": total})
-        # elif filter_type == "year":
-        #     current_year = today.year
-        #     for year in range(current_year - 1, current_year + 2): 
-        #         total = Payment.objects.filter(created_at__year=year).aggregate(total=Sum('amount'))['total'] or 0
-        #         data.append({"label": f"Năm {year}", "value": total})
 
         stats = {
             'total_patients': Patient.objects.count(),
@@ -101,7 +96,7 @@ class DashboardViewSet(viewsets.ViewSet):
             'total_staffs': Staff.objects.count(),
             'total_appointments': Appointment.objects.count(),
             'completed_appointments': Appointment.objects.filter(status='completed').count(),
-            'upcoming_appointments': Appointment.objects.filter(date__gte=today).count(),
+            'upcoming_appointments': Appointment.objects.filter(date__gte=today).exclude(status='completed').count(),
             'today_appointments': Appointment.objects.filter(date=today).count(),
             'month_appointments': Appointment.objects.filter(date__gte=current_month).count(),
             'pending_payments': Payment.objects.filter(status='pending').count(),

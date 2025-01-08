@@ -2,7 +2,6 @@ from django.db import models
 from accounts.models import User
 from departments.models import Department
 
-# Create your models here.
 class Doctor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     doctor_image = models.ImageField(upload_to='doctor_images/', null=True, blank=True)

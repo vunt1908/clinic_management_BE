@@ -1,7 +1,6 @@
 from django.db import models
 from patient.models import Patient
 
-# Create your models here.
 class Payment(models.Model):
     STATUS_CHOICES = (
         ('pending', 'Pending'),

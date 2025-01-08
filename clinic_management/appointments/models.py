@@ -3,7 +3,6 @@ from doctor.models import Doctor
 from patient.models import Patient
 from datetime import datetime
 
-# Create your models here.
 class Appointment(models.Model):
     STATUS_CHOICES = (
         ('pending', 'Pending'),
@@ -24,13 +23,6 @@ class Appointment(models.Model):
     
     doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    # examination = models.OneToOneField(
-    #     Examination,
-    #     on_delete=models.SET_NULL,
-    #     null=True,
-    #     blank=True,
-    #     related_name='appointment'
-    # )
     time_slot = models.CharField(max_length=20, choices=[(slot, slot) for slot in TIME_SLOTS])
     date = models.DateField()
     notes = models.TextField(null=True, blank=True)

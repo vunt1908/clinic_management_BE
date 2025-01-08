@@ -15,7 +15,7 @@ class DoctorViewSet(viewsets.ModelViewSet):
         
         return Response({
             'status': 'success',
-            'message': 'Doctor created successfully',
+            'message': 'Thêm mới bác sĩ thành công.',
             'data': DoctorSerializer(doctor).data
         }, status=status.HTTP_201_CREATED)
 
@@ -28,7 +28,7 @@ class DoctorViewSet(viewsets.ModelViewSet):
         
         return Response({
             'status': 'success',
-            'message': 'Doctor updated successfully',
+            'message': 'Cập nhật thông tin bác sĩ thành công.',
             'data': DoctorSerializer(doctor).data
         })
 
@@ -42,7 +42,7 @@ class DoctorViewSet(viewsets.ModelViewSet):
                 user.delete()
             return Response({
                 'status': 'success',
-                'message': 'Doctor deleted successfully'
+                'message': 'Xoá thành công bác sĩ.'
             }, status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
             return Response({

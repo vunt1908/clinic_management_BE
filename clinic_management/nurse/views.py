@@ -15,7 +15,7 @@ class NurseViewSet(viewsets.ModelViewSet):
         
         return Response({
             'status': 'success',
-            'message': 'Nurse created successfully',
+            'message': 'Thêm mới y tá thành công.',
             'data': NurseSerializer(nurse).data
         }, status=status.HTTP_201_CREATED)
 
@@ -28,7 +28,7 @@ class NurseViewSet(viewsets.ModelViewSet):
         
         return Response({
             'status': 'success',
-            'message': 'Nurse updated successfully',
+            'message': 'Cập nhật thông tin y tá thành công.',
             'data': NurseSerializer(nurse).data
         })
 
@@ -42,7 +42,7 @@ class NurseViewSet(viewsets.ModelViewSet):
                 user.delete()
             return Response({
                 'status': 'success',
-                'message': 'Nurse deleted successfully'
+                'message': 'Xoá thành công y tá.'
             }, status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
             return Response({

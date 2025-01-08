@@ -15,7 +15,7 @@ class StaffViewSet(viewsets.ModelViewSet):
         
         return Response({
             'status': 'success',
-            'message': 'Staff created successfully',
+            'message': 'Thêm mới nhân viên thành công.',
             'data': StaffSerializer(staff).data
         }, status=status.HTTP_201_CREATED)
 
@@ -28,7 +28,7 @@ class StaffViewSet(viewsets.ModelViewSet):
         
         return Response({
             'status': 'success',
-            'message': 'Staff updated successfully',
+            'message': 'Cập nhật thông tin nhân viên thành công.',
             'data': StaffSerializer(staff).data
         })
 
@@ -42,7 +42,7 @@ class StaffViewSet(viewsets.ModelViewSet):
                 user.delete()
             return Response({
                 'status': 'success',
-                'message': 'Staff deleted successfully'
+                'message': 'Xoá thành công nhân viên.'
             }, status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
             return Response({

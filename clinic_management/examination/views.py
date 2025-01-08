@@ -95,7 +95,7 @@ class ExaminationViewSet(viewsets.ModelViewSet):
             payment.save()
 
             return Response(
-                {"message": f"Trạng thái thanh toán đã được cập nhật thành {new_status}."},
+                {"message": f"Cập nhật trạng thái thanh toán thành công."},
                 status=status.HTTP_200_OK,
             )
         except Exception as e:

@@ -15,7 +15,7 @@ class PatientViewSet(viewsets.ModelViewSet):
         
         return Response({
             'status': 'success',
-            'message': 'Thêm mới bệnh nhân thành công',
+            'message': 'Thêm mới bệnh nhân thành công.',
             'data': PatientSerializer(patient).data
         }, status=status.HTTP_201_CREATED)
 
@@ -28,7 +28,7 @@ class PatientViewSet(viewsets.ModelViewSet):
         
         return Response({
             'status': 'success',
-            'message': 'Cập nhật thông tin bệnh nhân thành công',
+            'message': 'Cập nhật thông tin bệnh nhân thành công.',
             'data': PatientSerializer(patient).data
         })
 
@@ -42,7 +42,7 @@ class PatientViewSet(viewsets.ModelViewSet):
                 user.delete()
             return Response({
                 'status': 'success',
-                'message': 'Xoá bệnh nhân thành công'
+                'message': 'Xoá thành công bệnh nhân.'
             }, status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
             return Response({
