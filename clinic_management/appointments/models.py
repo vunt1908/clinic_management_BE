@@ -47,7 +47,7 @@ class Appointment(models.Model):
             booked_slots = Appointment.objects.filter(
                 doctor_id=doctor_id,
                 date=date,
-                status__in=['pending', 'confirmed', 'examining']
+                status__in=['pending', 'confirmed', 'examining', 'awaiting_clinical_results', 'paraclinical_results_available']
             ).values_list('time_slot', flat=True)
 
             return [slot for slot in all_slots if slot not in booked_slots]
